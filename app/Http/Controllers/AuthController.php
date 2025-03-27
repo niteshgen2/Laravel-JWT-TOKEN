@@ -6,18 +6,19 @@ use App\Http\Requests\UserRegisterRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\Controller;
 
 class AuthController extends Controller
 {
-    public function register(UserRegisterRequest $request){
+    public function register(UserRegisterRequest $request)
+    {
         $validatedData = $request->validated();
 
         $user = User::create([
             'name' => $validatedData['name'],
-            'email'=> $validatedData['email'],
-            'password'=> bcrypt($validatedData['password']),
+            'email' => $validatedData['email'],
+            'password' => bcrypt($validatedData['password']),
         ]);
+
         $token = auth('api')->login($user);
         return $this->respondWithToken($token);
     }
@@ -40,7 +41,7 @@ class AuthController extends Controller
 
     public function logout()
     {
-        auth()->logout();
+        auth('api')->logout(); // Ensure consistency by using auth('api') as in other methods
 
         return response()->json(['message' => 'Successfully logged out']);
     }
@@ -55,7 +56,7 @@ class AuthController extends Controller
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => auth('api')->factory()->getTTL() * 60
+            'expires_in' => auth('api')->factory()->getTTL() * 60,
         ]);
     }
 }
